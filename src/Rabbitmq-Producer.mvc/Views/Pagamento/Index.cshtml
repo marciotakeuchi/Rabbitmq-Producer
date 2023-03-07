@@ -1,0 +1,106 @@
+﻿@using System.Text.Json;
+@model PagamentoCreateViewModel
+@{
+    ViewData["Title"] = "Confirmação de Pagamento";
+
+    var tempDataPagamentos = TempData["pagamentos"];
+
+    List<PagamentoViewModel>? ListaPagamentos = (
+        tempDataPagamentos != null
+        ? JsonSerializer.Deserialize<List<PagamentoViewModel>>(tempDataPagamentos.ToString())
+        : new List<PagamentoViewModel>());
+
+    TempData["pagamentos"] = JsonSerializer.Serialize(ListaPagamentos);
+}
+
+<div class="text-center">
+    <h1 class="display-4">Confirme o Pagamento com boleto</h1>
+
+    <p class="h2">Informe seus dados e o código do pagamento para agilizar o processo de validação.</p>
+
+    @if (TempData["message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["messageError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["messageError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
+    <form method="post" asp-action="Index" asp-anti-forgery="true">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-start">
+                    <div class="form-group">
+                        <label asp-for="@Model.NomeCompleto" class="form-label">Nome completo:</label>
+                        <input asp-for="@Model.NomeCompleto" class="form-control" />
+                        <span asp-validation-for="@Model.NomeCompleto" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="@Model.ComprovantePagamento" class="form-label">ComprovantePagamento</label>
+                        <input asp-for="@Model.ComprovantePagamento" class="form-control" />
+                        <span asp-validation-for="@Model.ComprovantePagamento" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-start">
+                    <div class="form-group">
+                        <label asp-for="@Model.Email" class="form-label">E-mail</label>
+                        <input asp-for="@Model.Email" type="email" class="form-control" />
+                        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="@Model.DataPagamento" class="form-label">Data de Pagamento</label>
+                        <input asp-for="@Model.DataPagamento" class="form-control" />
+                        <span asp-validation-for="@Model.DataPagamento" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center p-4">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Confirmar</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <hr />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nome Completo</th>
+                <th>E-mail</th>
+                <th>Comprovante</th>
+                <th>Data de Pagamento</th>
+                <th>Situação</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var pagamento in ListaPagamentos)
+            {
+                <tr>
+                    <td>@pagamento.NomeCompleto</td>
+                    <td>@pagamento.Email</td>
+                    <td>@pagamento.ComprovantePagamento</td>
+                    <td>@pagamento.DataPagamento.ToShortDateString()</td>
+                    <td>@pagamento.Situacao</td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
